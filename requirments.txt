@@ -1,0 +1,16 @@
+aiohttp
+autogen-agentchat
+autogen-ext
+azure-ai-inference
+azure-identity
+backports.tarfile
+docopt
+dotenv
+httpx
+ipython
+jaraco.collections
+nbconvert
+pip-chill
+tinycss2
+tomli
+yarg
