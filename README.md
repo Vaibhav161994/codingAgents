@@ -26,8 +26,13 @@ An automated coding agent system built with Microsoft's Autogen framework, confi
 
 4. **Configuration**
    # API Configuration 
-   AZURE_OPENAI_ENDPOINT = your_model_endpoint
-   AZURE_OPENAI_KEY = your_api_key
+   Create .env file in root directory based on .env_sample and update the below variables.
+
+   # AZURE OPEN AI
+   - AZURE_OPENAI_ENDPOINT = your_model_endpoint
+   - AZURE_OPENAI_KEY = your_api_key
+   - AZURE_OPENAI_API_VERSION = your_model_version (Optional Parameter)
+   - AZURE_OPENAI_MODEL_NAME = your_model_name
 
 5. **Usage**
    python codingAssistant.py
