@@ -1,0 +1,12 @@
+Review the ongoing discussion context and available roles below to determine the appropriate next agent.  
+**Roles:**  
+{roles}  
+**Conversation History:**  
+{history}  
+
+From the participant list {participants}, choose the most suitable agent to complete the subsequent task. Follow these guidelines:  
+1. **Mandatory User Input Check:** If the last active agent was *not* "user_proxy", **you must immediately select "user_proxy"** to gather user feedback before proceeding to next agent.  
+2. **Single Agent Selection:** Only one agent can be chosen per step.  
+3. **No Consecutive Agents:** Never assign the same agent back-to-back tasks.  
+
+Prioritize adherence to these rules when making your selection.
