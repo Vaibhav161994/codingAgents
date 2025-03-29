@@ -1,4 +1,4 @@
-# codingAgents
+# AI Coding Assistant
 Code generation and executor agent.
 
 An automated coding agent system built with Microsoft's Autogen framework, configured with `dotenv` for secure environment management.
@@ -36,4 +36,7 @@ An automated coding agent system built with Microsoft's Autogen framework, confi
    - AZURE_OPENAI_MODEL_NAME = your_model_name
 
 6. **Usage**
+   Use the below command to start the Coding Assistant.
+   
+   ```bash
    python codingAssistant.py
