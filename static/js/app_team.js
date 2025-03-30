@@ -4,22 +4,47 @@ function getWebSocketUrl() {
     return `${protocol}//${host}/ws/chat`;
 }
 
-console.log('WebSocket URL:', getWebSocketUrl());
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+}
 
-let ws = new WebSocket(getWebSocketUrl());
+// Initialize theme
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+});
+
+// UI Element References
+const UI = {
+    messageInput: () => document.getElementById('message-input'),
+    sendButton: () => document.getElementById('send-button'),
+    cancelButton: () => document.getElementById('cancel-button'),
+    messagesContainer: () => document.getElementById('messages'),
+    spinner: () => document.getElementById('spinner')
+};
+
+// State Management
+let isRequestActive = false;
 let isChatActive = false;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
+
+let ws = new WebSocket(getWebSocketUrl());
 
 ws.onmessage = function (event) {
     const message = JSON.parse(event.data);
 
     if (message.type === 'UserInputRequestedEvent') {
-        enableInput();
+        toggleUIControls(false);
     }
     else if (message.type === 'error') {
         displayMessage(message.content, 'error');
-        enableInput();
+        toggleUIControls(false);
     }
     else {
         displayMessage(message, message.source);
@@ -33,7 +58,7 @@ ws.onerror = function (error) {
         source: 'error'
     };
     displayMessage(error_message, 'error');
-    enableInput();
+    toggleUIControls(false);
 };
 
 ws.onclose = function() {
@@ -60,66 +85,81 @@ document.getElementById('message-input').addEventListener('keydown', function (e
     }
 });
 
-// Add cancel functionality
-function cancelChat() {
-    if (ws && isChatActive) {
-        ws.close();
-        isChatActive = false;
-        document.getElementById('cancel-button').style.display = 'none';
-        document.getElementById('send-button').disabled = false;
+// UI Controls
+function toggleUIControls(disabled) {
+    UI.messageInput().disabled = disabled;
+    UI.sendButton().disabled = disabled;
+    UI.cancelButton().style.display = disabled ? 'inline-flex' : 'none';
+}
+
+function showSpinner() {
+    UI.spinner().style.display = 'block';
+}
+
+function hideSpinner() {
+    UI.spinner().style.display = 'none';
+}
+
+// Message Handling
+async function sendMessage() {
+    const message = UI.messageInput().value.trim();
+    
+    if (!message) return;
+    
+    try {
+        isRequestActive = true;
+        isChatActive = true;
+        
+        showSpinner();
+        toggleUIControls(true);
+        
+        UI.messageInput().value = '';
+        
+        await ws.send(JSON.stringify({ 
+            content: message, 
+            source: 'user' 
+        }));
+    } catch (error) {
+        console.error('Failed to send message:', error);
+        toggleUIControls(false);
     }
 }
 
-async function sendMessage() {
-    const input = document.getElementById('message-input');
-    const button = document.getElementById('send-button');
-    const message = input.value;
-    if (!message) return;
-    document.getElementById('cancel-button').style.display = 'inline-flex';
-    document.getElementById('send-button').disabled = true;
-    isChatActive = true;
-    // Clear input and disable input and send button
-    input.value = '';
-    disableInput();
-
-    // Send message to WebSocket
-    ws.send(JSON.stringify({ content: message, source: 'user' }));
-}
-
 function displayMessage(message, source) {
-    
-    const messagesContainer = document.getElementById('messages');
     const messageElement = document.createElement('div');
-    messageElement.className = `message ${source}`;
-
+    messageElement.className = `message ${source} new-message`;
+    
     if (message.isHtml) {
         messageElement.innerHTML = message.content;
     } else {
         messageElement.textContent = message.content;
     }
-
+    
     const labelElement = document.createElement('span');
     labelElement.className = 'label';
     labelElement.textContent = source;
-
+    
     messageElement.prepend(labelElement);
-    // messageElement.appendChild(contentElement);
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollIntoView({ behavior: 'smooth' });
+    UI.messagesContainer().appendChild(messageElement);
+    
+    messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    
+    setTimeout(() => {
+        messageElement.classList.remove('new-message');
+    }, 1000);
+    
+    if (source !== 'user' && source !== 'user_proxy') {
+        isRequestActive = false;
+        hideSpinner();
+        toggleUIControls(false);
+    }
 }
 
-function disableInput() {
-    const input = document.getElementById('message-input');
-    const button = document.getElementById('send-button');
-    input.disabled = true;
-    button.disabled = true;
-}
-
-function enableInput() {
-    const input = document.getElementById('message-input');
-    const button = document.getElementById('send-button');
-    input.disabled = false;
-    button.disabled = false;
+function cancelChat() {
+    isRequestActive = false;
+    isChatActive = false;
+    hideSpinner();
+    toggleUIControls(false);
 }
 
 function getBaseUrl() {

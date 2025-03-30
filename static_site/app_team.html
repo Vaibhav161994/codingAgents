@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -12,8 +11,19 @@
 </head>
 
 <body>
+    <div id="theme-toggle">
+        <button onclick="toggleTheme()">
+            <i class="fas fa-moon dark-icon"></i>
+            <i class="fas fa-sun light-icon"></i>
+        </button>
+    </div>
     <div id="chat-container">
         <div id="messages"></div>
+        <div id="spinner" class="spinner" style="display: none;">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
         <div id="input-container">
             <input type="text" id="message-input" placeholder="Type a message...">
             <button id="cancel-button" onclick="cancelChat()" style="display: none;">
