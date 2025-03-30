@@ -61,7 +61,6 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
@@ -69,9 +68,7 @@ jobs:
           app-name: 'codingassistant'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B071A1193A3B46A5BEE5EB66E15AD291 }}
-          startup-command: 'python -m uvicorn app_team:app --host 0.0.0.0 --port 8000'
 
-      # Add Azure App Service Configuration
       - name: Azure App Service Settings
         uses: azure/appservice-settings@v1
         with:
@@ -86,5 +83,9 @@ jobs:
               {
                 "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
                 "value": "true"
+              },
+              {
+                "name": "STARTUP_COMMAND",
+                "value": "python -m uvicorn app_team:app --host 0.0.0.0 --port 8000"
               }
             ]
