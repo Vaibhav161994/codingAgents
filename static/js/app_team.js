@@ -106,11 +106,16 @@ function enableInput() {
     button.disabled = false;
 }
 
+function getBaseUrl() {
+    return window.location.origin;
+}
+
 async function loadHistory() {
     try {
-        const response = await fetch('http://localhost:8002/history');
+        const baseUrl = getBaseUrl();
+        const response = await fetch(`${baseUrl}/history`);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         const history = await response.json();
         history.forEach(message => {
@@ -118,6 +123,11 @@ async function loadHistory() {
         });
     } catch (error) {
         console.error('Error loading history:', error);
+        const errorMessage = {
+            content: "Failed to load chat history. Please refresh the page.",
+            source: 'error'
+        };
+        displayMessage(errorMessage, 'error');
     }
 }
 
