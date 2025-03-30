@@ -1,8 +1,10 @@
 function getWebSocketUrl() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = getBaseUrl();
+    const host = window.location.host;
     return `${protocol}//${host}/ws/chat`;
 }
+
+console.log('WebSocket URL:', getWebSocketUrl());
 
 let ws = new WebSocket(getWebSocketUrl());
 let isChatActive = false;
