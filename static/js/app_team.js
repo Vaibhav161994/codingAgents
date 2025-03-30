@@ -1,41 +1,55 @@
-const ws = new WebSocket('ws://localhost:8002/ws/chat');
+function getWebSocketUrl() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = getBaseUrl();
+    return `${protocol}//${host}/ws/chat`;
+}
+
+let ws = new WebSocket(getWebSocketUrl());
 let isChatActive = false;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
 
 ws.onmessage = function (event) {
     const message = JSON.parse(event.data);
 
     if (message.type === 'UserInputRequestedEvent') {
-        // Re-enable input and send button if UserInputRequestedEvent is received
         enableInput();
     }
     else if (message.type === 'error') {
-        // Display error message
         displayMessage(message.content, 'error');
         enableInput();
     }
     else {
-        // Display regular message
         displayMessage(message, message.source);
     }
 };
 
 ws.onerror = function (error) {
-    error_message = {};
-    error_message.content = "WebSocket error occurred. Please refresh the page.";
-    error_message.source = 'error';
+    console.error('WebSocket error:', error);
+    const error_message = {
+        content: "Connection error. Attempting to reconnect...",
+        source: 'error'
+    };
     displayMessage(error_message, 'error');
     enableInput();
 };
 
-ws.onclose = function () {
-    error_message = {};
-    error_message.content = "Connection closed. Please refresh the page."
-    error_message.source = 'system';
-    displayMessage(error_message, 'system');
-    disableInput();
-    isChatActive = false;
-    document.getElementById('cancel-button').style.display = 'none';
-    document.getElementById('send-button').disabled = false;
+ws.onclose = function() {
+    if (reconnectAttempts < maxReconnectAttempts) {
+        reconnectAttempts++;
+        setTimeout(() => {
+            console.log(`Reconnecting... Attempt ${reconnectAttempts}`);
+            const newWs = new WebSocket(getWebSocketUrl());
+            Object.assign(newWs, ws);
+            ws = newWs;
+        }, 1000 * reconnectAttempts);
+    } else {
+        const error_message = {
+            content: "Connection lost. Please refresh the page.",
+            source: 'error'
+        };
+        displayMessage(error_message, 'error');
+    }
 };
 
 document.getElementById('message-input').addEventListener('keydown', function (event) {
