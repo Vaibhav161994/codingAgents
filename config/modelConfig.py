@@ -1,6 +1,5 @@
 # config.py
 from autogen_ext.models.azure import AzureAIChatCompletionClient
-from autogen_ext.models.ollama import OllamaChatCompletionClient
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from azure.core.credentials import AzureKeyCredential
 from autogen_core.models import ModelFamily
