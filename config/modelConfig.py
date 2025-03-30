@@ -4,7 +4,8 @@ from autogen_ext.models.ollama import OllamaChatCompletionClient
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from azure.core.credentials import AzureKeyCredential
 from autogen_core.models import ModelFamily
-import os, httpx
+import os
+import httpx
 from dotenv import load_dotenv
 
 class modelConfig:
