@@ -22,6 +22,8 @@ An automated coding agent system built with Microsoft's Autogen framework, confi
    cd codingAgents
 
 3. **Install Dependencies**
+
+   ```bash
    pip install -r requirements.txt
 
 4. **Configuration**
