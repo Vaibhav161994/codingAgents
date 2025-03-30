@@ -72,7 +72,7 @@ async def get_team(
     user_proxy = UserProxyAgent("user_proxy", input_func=user_input_func)
       
     # The termination condition is a combination of text termination and max message termination, either of which will cause the chat to terminate.
-    termination = TextMentionTermination("BYE") | MaxMessageTermination(10)
+    termination = TextMentionTermination("BYE") | MaxMessageTermination(50)
 
     selector_prompt = Path('prompts/selector_prompt.txt').read_text()
 
@@ -151,14 +151,14 @@ async def chat(websocket: WebSocket):
                         # Don't save user input events to history.
                         history.append(message.model_dump())
 
-                # Save team state to file.
-                async with aiofiles.open(state_path, "w") as file:
-                    state = await team.save_state()
-                    await file.write(json.dumps(state))
+                # # Save team state to file.
+                # async with aiofiles.open(state_path, "w") as file:
+                #     state = await team.save_state()
+                #     await file.write(json.dumps(state))
 
-                # Save chat history to file.
-                async with aiofiles.open(history_path, "w") as file:
-                    await file.write(json.dumps(history))
+                # # Save chat history to file.
+                # async with aiofiles.open(history_path, "w") as file:
+                #     await file.write(json.dumps(history))
                     
             except Exception as e:
                 # Send error message to client
